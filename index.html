@@ -1,543 +1,623 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<meta name="theme-color" content="#030a12">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="PREMO1127">
-<title>PREMO1127 • Mission Control Dashboard</title>
-<link rel="manifest" href='data:application/manifest+json,{"name":"PREMO1127 Mission Control","short_name":"PREMO1127","display":"standalone","background_color":"#030a12","theme_color":"#030a12"}'>
-<style>
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap");
-:root{
-  --bg:#030a12;
-  --bg2:#06111c;
-  --panel:#07131f;
-  --panel2:#091927;
-  --cyan:#00d5ff;
-  --cyan-soft:rgba(0,213,255,.16);
-  --cyan-line:rgba(0,213,255,.30);
-  --text:#d9f7ff;
-  --muted:#7dbdce;
-  --green:#31ff98;
-  --red:#ff3f52;
-}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;background:
- radial-gradient(circle at 50% 0%, rgba(0,140,220,.12), transparent 28%),
- linear-gradient(180deg, #02070d, #06101a 30%, #030a12 100%);
- color:var(--text);font-family:Inter,system-ui,Arial,sans-serif;overflow:hidden}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;background-image:
- linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px),
- linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px);
- background-size:34px 34px}
-body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;
- background:repeating-linear-gradient(180deg, rgba(255,255,255,.12) 0 1px, transparent 1px 4px)}
-#app{height:100%;padding:12px;display:grid;grid-template-rows:110px 1fr 102px;gap:12px}
-.panel,.top-card,.bottom-stat,.tile,.mini-panel{
-  position:relative;background:linear-gradient(180deg, rgba(5,16,26,.96), rgba(2,8,15,.96));
-  border:1px solid var(--cyan-line);box-shadow:inset 0 0 24px rgba(0,213,255,.05),0 0 18px rgba(0,213,255,.04);
-}
-.panel::before,.top-card::before,.bottom-stat::before,.tile::before,.mini-panel::before{
-  content:"";position:absolute;left:10px;right:10px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.8}
-.topbar{display:grid;grid-template-columns:330px repeat(3,1fr) 300px;gap:12px;align-items:stretch}
-.brand{padding:16px 20px 12px 22px;clip-path:polygon(0 0, 92% 0, 100% 18%, 100% 100%, 0 100%)}
-.brand h1{margin:0;font:900 28px Orbitron,sans-serif;letter-spacing:.06em;color:#9eefff;text-shadow:0 0 18px rgba(0,213,255,.25)}
-.brand .sub{margin-top:8px;font:500 14px Orbitron,sans-serif;letter-spacing:.08em;color:#b5ecff}
-.top-card{padding:14px 18px;display:grid;align-content:center;justify-items:center;text-align:center}
-.top-card .label{font:500 12px Orbitron,sans-serif;letter-spacing:.12em;color:#9bdff1;text-transform:uppercase}
-.top-card .value{margin-top:8px;font:700 18px Orbitron,sans-serif;color:var(--green);letter-spacing:.06em}
-.top-card .value.blue{color:var(--cyan)}
-.clock-card{padding:14px 18px;text-align:right;clip-path:polygon(12% 0,100% 0,100% 100%,0 100%,0 18%)}
-.clock-card .time{font:900 40px Orbitron,sans-serif;color:#8fe9ff;letter-spacing:.06em;text-shadow:0 0 18px rgba(0,213,255,.25)}
-.clock-card .date{margin-top:8px;font:500 14px Orbitron,sans-serif;letter-spacing:.08em;color:#c3f3ff}
-.main{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(420px,1.1fr);gap:12px;min-height:0}
-.left-stack,.center-col,.right-stack{display:grid;gap:12px;min-height:0}
-.left-stack{display:none}
-.center-col{grid-template-rows:1fr}
-.right-stack{grid-template-rows:330px 1fr}
-.panel-header{padding:11px 16px;border-bottom:1px solid rgba(0,213,255,.18);display:flex;align-items:center;justify-content:space-between}
-.panel-title{font:700 14px Orbitron,sans-serif;letter-spacing:.1em;color:#8fe9ff;text-transform:uppercase}
-.panel-body{padding:14px;min-height:0;height:calc(100% - 48px)}
-.time-box{display:grid;align-content:center;justify-items:center;height:100%}
-.time-box .big{font:900 40px Orbitron,sans-serif;color:#00c8ff;text-shadow:0 0 18px rgba(0,213,255,.24)}
-.time-box .small{margin-top:8px;font:500 13px Orbitron,sans-serif;letter-spacing:.08em;color:#c7f4ff;text-align:center;line-height:1.6}
-.overview-grid{display:grid;gap:14px}
-.metric-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
-.metric-row .name{font:500 11px Orbitron,sans-serif;letter-spacing:.08em;color:#c8f4ff}
-.metric-row .val{font:700 11px Orbitron,sans-serif;color:#8fe9ff}
-.bar{margin-top:7px;height:10px;border:1px solid rgba(0,213,255,.20);background:rgba(255,255,255,.02);position:relative;overflow:hidden}
-.bar span{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg, rgba(0,213,255,.25), rgba(0,213,255,.95))}
-.cctv-shell{display:grid;grid-template-rows:1fr auto;gap:12px;height:100%}
-.cctv-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;height:100%}
-.tile{min-height:240px}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PREMO1127 • AI Control HUD</title>
+  <style>
+    :root {
+      --bg:#020611;
+      --bg2:#061127;
+      --panel:#07101f;
+      --panel2:#0a1528;
+      --line:rgba(63,131,248,.25);
+      --line-red:rgba(239,68,68,.38);
+      --cyan:#67e8f9;
+      --blue:#3b82f6;
+      --red:#ff2a2a;
+      --text:#edf4ff;
+      --muted:#97a9cc;
+      --radius:14px;
+      --shadow:0 16px 42px rgba(0,0,0,.42);
+    }
 
-.cctv-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
-.tile{overflow:hidden;border-radius:4px}
-.tile img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.05)}
-.tile-overlay{position:absolute;inset:0;display:grid;grid-template-rows:auto 1fr auto;pointer-events:none;background:linear-gradient(180deg, rgba(0,0,0,.40), rgba(0,0,0,0) 35%, rgba(0,0,0,0) 65%, rgba(0,0,0,.46))}
-.tile-top,.tile-bottom{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;font:700 11px Orbitron,sans-serif;letter-spacing:.06em}
-.tile-name{color:#f3fbff;text-shadow:0 0 8px rgba(0,0,0,.5)}
-.live{display:flex;align-items:center;gap:7px;color:#fff}
-.live::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 12px rgba(255,63,82,.6)}
-.tile-bottom{color:#d8fbff}
-.cctv-controls{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center}
-.preset-strip{display:flex;gap:8px;flex-wrap:wrap}
-.preset-strip button,.ghost-btn,.radio-btn,.radio-open,.refresh-btn{appearance:none;border:1px solid rgba(0,213,255,.32);background:rgba(0,213,255,.07);color:#92ebff;padding:9px 12px;font:700 11px Orbitron,sans-serif;letter-spacing:.08em;cursor:pointer}
-.preset-strip button.active,.radio-btn.active{background:rgba(0,213,255,.18);box-shadow:0 0 14px rgba(0,213,255,.12), inset 0 0 10px rgba(0,213,255,.05)}
-.ghost-btn{padding-inline:16px}
-.weather-layout{display:grid;grid-template-rows:146px 1fr;gap:12px;height:100%}
-.weather-main{display:grid;grid-template-columns:1.05fr .95fr;gap:12px}
-.wx-left{padding:10px 14px;border:1px solid rgba(0,213,255,.18);background:rgba(0,0,0,.16)}
-.wx-place{font:700 13px Orbitron,sans-serif;color:#89eaff;letter-spacing:.08em}
-.wx-temp{margin-top:12px;font:900 68px Orbitron,sans-serif;color:#9deeff;line-height:1}
-.wx-desc{margin-top:8px;font:500 18px Orbitron,sans-serif;color:#d8fbff;letter-spacing:.04em}
-.wx-right{padding:10px 14px;border:1px solid rgba(0,213,255,.18);background:rgba(0,0,0,.16);display:grid;align-content:start;gap:10px}
-.wx-line{display:grid;grid-template-columns:1fr auto;gap:10px;font:500 12px Orbitron,sans-serif;letter-spacing:.06em;color:#c8f4ff}
-.wx-line .good{color:var(--green)}
-.forecast-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.day-card{border:1px solid rgba(0,213,255,.16);background:rgba(0,0,0,.16);padding:12px 8px;text-align:center}
-.day-card .day{font:700 12px Orbitron,sans-serif;color:#d8fbff;letter-spacing:.08em}
-.day-card .icon{font-size:26px;margin:10px 0 8px}
-.day-card .hi{font:700 16px Orbitron,sans-serif;color:#fff}
-.day-card .lo{margin-top:6px;font:700 12px Orbitron,sans-serif;color:#49d8ff}
-.radio-layout{display:grid;grid-template-rows:auto auto 148px auto 1fr;gap:10px;height:100%}
-.radio-presets{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.radio-btn{padding:8px}
-.radio-console-grid{display:grid;grid-template-columns:1fr auto;gap:8px}
-.radio-select{width:100%;background:#06111b;color:#b9f3ff;border:1px solid rgba(0,213,255,.22);padding:10px;font:500 11px Orbitron,sans-serif}
-.radio-open{border-color:rgba(255,63,82,.42);background:rgba(255,63,82,.08);color:#ffb3bb}
-.receiver-box{border:1px solid rgba(0,213,255,.16);background:#02070d;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.receiver-box iframe{width:100%;height:100%;border:0;background:#02070d}
-.receiver-fallback{padding:14px;text-align:center;font:500 11px Orbitron,sans-serif;letter-spacing:.08em;color:#bdefff;line-height:1.6}
-.info-grid{display:grid;grid-template-columns:90px 1fr;gap:8px 10px;font:500 11px Orbitron,sans-serif;letter-spacing:.06em;color:#97d8e8}
-.info-grid .v{color:#e7fbff;font-weight:700}
-.bottom{display:grid;grid-template-rows:1fr 42px;gap:12px;min-height:0}
-.news-panel{overflow:hidden}
-.news-header{padding:11px 16px;border-bottom:1px solid rgba(0,213,255,.16);display:flex;justify-content:space-between;align-items:center}
-.news-header .left{font:700 14px Orbitron,sans-serif;color:#8fe9ff;letter-spacing:.08em;text-transform:uppercase}
-.news-header .right{font:500 12px Orbitron,sans-serif;color:#bdefff;letter-spacing:.06em}
-.ticker-wrap{position:relative;height:100%;overflow:hidden}
-.ticker{position:absolute;left:0;top:50%;transform:translateY(-50%);white-space:nowrap;font:500 22px Orbitron,sans-serif;letter-spacing:.04em;color:#dbfbff;text-shadow:0 0 10px rgba(0,213,255,.15)}
-.ticker .stamp{color:#00d5ff;margin-right:14px}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr) 220px;gap:12px}
-.bottom-stat{display:flex;align-items:center;justify-content:center;font:500 12px Orbitron,sans-serif;letter-spacing:.08em;color:#a4e7f7}
-.bottom-stat strong{margin-left:8px;color:#fff}
-.bottom-stat .mini-bar{width:84px;height:8px;margin-left:12px;border:1px solid rgba(0,213,255,.2);position:relative;background:rgba(255,255,255,.02)}
-.bottom-stat .mini-bar span{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg, rgba(0,213,255,.25), rgba(0,213,255,.95));width:60%}
-.link-overlay{position:absolute;inset:0;z-index:3}
-@media (max-width: 1400px){
-  #app{grid-template-rows:96px 1fr 96px}
-  .topbar{grid-template-columns:280px repeat(3,1fr) 260px}
-  .main{grid-template-columns:220px 1.4fr 1.2fr}
-  .wx-temp{font-size:58px}
-  .clock-card .time{font-size:34px}
-}
-</style>
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body {
+      margin:0; padding:0; width:100%; height:100%; overflow:hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(59,130,246,.14), transparent 20%),
+        radial-gradient(circle at bottom left, rgba(239,68,68,.12), transparent 25%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+    }
+    body::before {
+      content:""; position:fixed; inset:0; pointer-events:none; opacity:.22;
+      background-image:
+        linear-gradient(rgba(0,140,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,140,255,.06) 1px, transparent 1px);
+      background-size:22px 22px;
+    }
+    body::after {
+      content:""; position:fixed; inset:0; pointer-events:none;
+      background:linear-gradient(90deg, rgba(255,0,0,.06), transparent 18%, transparent 82%, rgba(0,110,255,.08));
+      mix-blend-mode:screen;
+    }
+
+    .hud {
+      position:relative; z-index:1; width:100vw; height:100vh;
+      padding:10px 10px 46px;
+      display:grid; gap:10px;
+      grid-template-rows:72px 40px minmax(0,1fr) 28px;
+    }
+
+    .top-row {
+      display:grid; gap:10px;
+      grid-template-columns: 150px 1fr 210px;
+      min-height:0;
+    }
+
+    .main-row {
+      display:grid; gap:10px;
+      grid-template-columns: 1.22fr .78fr;
+      min-height:0;
+    }
+
+    .left-grid {
+      display:grid; gap:10px;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:1fr 1fr;
+      min-height:0;
+    }
+
+    .panel {
+      position:relative;
+      background:linear-gradient(180deg, rgba(7,16,31,.96), rgba(5,11,22,.98));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.02);
+      overflow:hidden;
+      min-height:0;
+      transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+    .panel::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,0,0,.05), transparent 18%, transparent 82%, rgba(59,130,246,.06)),
+        radial-gradient(circle at top right, rgba(59,130,246,.10), transparent 25%);
+    }
+    .panel.tapable { cursor:pointer; }
+    .panel.tapable:active { transform:scale(.992); }
+    .panel.expanded {
+      position:fixed; inset:14px 14px 54px 14px; z-index:100; transform:none !important;
+      border-color:rgba(103,232,249,.45); box-shadow:0 24px 64px rgba(0,0,0,.55);
+    }
+
+    .overlay {
+      position:fixed; inset:0; background:rgba(2,6,23,.58); backdrop-filter:blur(5px);
+      z-index:90; display:none;
+    }
+    .overlay.show { display:block; }
+
+    .panel-head {
+      position:relative; z-index:1; height:28px;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:4px 12px;
+      background:linear-gradient(90deg, rgba(255,0,0,.04), transparent 18%, transparent 82%, rgba(59,130,246,.06));
+    }
+    .panel-title {
+      font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.28em; color:#eef5ff;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .panel-body {
+      position:relative; z-index:1; height:calc(100% - 28px); min-height:0; overflow:hidden; padding:6px 10px 8px;
+    }
+    .weather-panel-body {
+      padding: 4px 10px;
+    }
+    .time-panel-body {
+      padding-top: 2px;
+    }
+    .badge {
+      display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+      padding:4px 9px; border-radius:999px; font-size:9px; font-weight:900;
+      text-transform:uppercase; letter-spacing:.18em;
+      color:#d7f6ff; border:1px solid rgba(103,232,249,.22); background:rgba(30,64,88,.48);
+      box-shadow: inset 0 0 10px rgba(103,232,249,.05);
+    }
+    .badge.red { color:#fecaca; border-color:rgba(239,68,68,.25); background:rgba(92,23,23,.34); }
+    .badge.green { color:#bbf7d0; border-color:rgba(34,197,94,.25); background:rgba(14,58,38,.34); }
+
+    .brand-box {
+      display:flex; flex-direction:column; justify-content:center; padding:10px 14px;
+      background:linear-gradient(180deg, rgba(11,19,34,.98), rgba(8,13,24,.98));
+      border-color:rgba(239,68,68,.32);
+      box-shadow:var(--shadow), inset 0 0 20px rgba(239,68,68,.06);
+    }
+    .brand-main { font-size:16px; font-weight:1000; line-height:1; }
+    .brand-main .brand-red { color:#ff3434; font-style:italic; display:block; }
+    .brand-main .brand-subline { display:block; color:#ff3434; font-size:10px; margin-top:4px; letter-spacing:.05em; }
+    .status-line { margin-top:8px; display:flex; align-items:center; gap:6px; font-size:10px; font-weight:700; }
+    .status-line .dot { width:8px; height:8px; border-radius:999px; background:#00ff66; box-shadow:0 0 10px rgba(0,255,102,.7); }
+    .status-online { color:#30ff7a; }
+    .brand-actions { display:none; }
+    .mini-btn {
+      border:1px solid rgba(255,255,255,.08); border-radius:8px; background:rgba(255,255,255,.03);
+      padding:8px 6px; font-size:10px; font-weight:900; text-transform:uppercase; text-align:center;
+    }
+    .mini-btn.alert { position:relative; }
+    .mini-btn.alert::after { content:"2"; position:absolute; top:-6px; right:-6px; width:16px; height:16px; display:grid; place-items:center; border-radius:999px; background:#ff1d1d; color:#fff; font-size:10px; }
+
+    .weather-wrap { display:grid; grid-template-columns:.72fr 1.28fr; gap:8px; align-items:center; }
+    .weather-left { display:flex; flex-direction:column; justify-content:flex-start; padding-top:0; }
+    .temp-row { display:flex; align-items:center; gap:8px; margin-top:0; }
+    .weather-icon { font-size:28px; line-height:1; }
+    .temp { font-size:16px; font-weight:1000; line-height:1; }
+    .desc { margin-top:4px; font-size:10px; color:var(--muted); }
+    .feels { margin-top:4px; font-size:10px; color:#d8e7ff; }
+    .mini-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; align-content:start; }
+    .mini-box {
+      border-radius:10px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03); padding:4px 6px;
+      box-shadow: inset 0 0 10px rgba(255,255,255,.015);
+      min-height: 34px;
+    }
+    .label { font-size:7px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+    .value { margin-top:2px; font-size:10px; font-weight:800; }
+    .forecast { margin-top:4px; display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+    .day { border-radius:10px; border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03); padding:3px 4px; text-align:center; min-height: 48px; }
+    .day-icon { font-size:13px; line-height:1; margin-bottom:3px; }
+    .day .value { font-size:9px; }
+
+    .clock-panel { display:flex; flex-direction:column; justify-content:flex-start; align-items:center; text-align:center; height:100%; padding-top:2px; }
+    .clock-time { font-size:28px; font-weight:1000; line-height:1; letter-spacing:.03em; }
+    .clock-date { margin-top:4px; font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:#ff4040; font-weight:900; }
+
+    .news-strip {
+      position:relative; overflow:hidden; display:flex; align-items:center; gap:10px;
+      background:linear-gradient(180deg, rgba(8,16,30,.98), rgba(5,10,21,.98));
+    }
+    .news-label {
+      flex:0 0 auto; margin-left:10px; padding:6px 12px; border-radius:8px;
+      font-size:10px; font-weight:1000; text-transform:uppercase; letter-spacing:.18em;
+      color:#fff2f2; background:linear-gradient(180deg, rgba(190,22,22,.95), rgba(140,14,14,.95)); border:1px solid rgba(255,70,70,.35);
+    }
+    .ticker-viewport { flex:1 1 auto; overflow:hidden; white-space:nowrap; }
+    .ticker-track {
+      display:inline-block; min-width:100%; padding-left:100%; animation:ticker 58s linear infinite;
+      font-size:13px; color:#edf4ff;
+    }
+    @keyframes ticker { from { transform:translateX(0); } to { transform:translateX(-100%); } }
+
+    .cam-box {
+      position:relative;
+      display:grid; grid-template-rows:auto 1fr; min-height:0;
+      border-radius:12px; overflow:hidden; border:1px solid rgba(53,111,197,.28); background:rgba(255,255,255,.025);
+      box-shadow: inset 0 0 14px rgba(0,0,0,.18);
+    }
+    .cam-head {
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.03);
+    }
+    .cam-title-row { display:flex; align-items:center; gap:8px; }
+    .cam-num {
+      width:28px; height:28px; border-radius:6px; display:grid; place-items:center; font-weight:1000; font-size:16px;
+      color:#fff; background:linear-gradient(180deg, rgba(178,26,26,.95), rgba(126,14,14,.95)); border:1px solid rgba(255,110,110,.32);
+    }
+    .cam-name { font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; }
+    .cam-sub { margin-top:2px; font-size:10px; color:var(--muted); }
+    .live-tag { display:flex; align-items:center; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.1em; }
+    .live-dot { width:10px; height:10px; border-radius:999px; background:#ff1212; box-shadow:0 0 10px rgba(255,20,20,.8); display:inline-block; margin-right:7px; }
+    .cam-view {
+      position:relative; background:#020711 center/cover no-repeat;
+    }
+    .cam-view.bridge { background-image:url('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80'); }
+    .cam-view.official { background-image:url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=80'); }
+    .cam-view.traffic { background-image:url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1200&q=80'); }
+    .cam-view.route { background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1200&q=80'); }
+    .cam-view::after {
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg, transparent 55%, rgba(0,0,0,.58));
+    }
+    .cam-footer {
+      position:absolute; left:12px; right:12px; bottom:8px; z-index:3; display:flex; justify-content:space-between; align-items:center;
+      font-size:10px; font-weight:800; letter-spacing:.08em;
+    }
+    .cam-time { color:#f3f7ff; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+    .cam-link { color:#55a9ff; }
+
+    .radio-layout { height:100%; display:grid; gap:10px; grid-template-rows:auto auto 1fr 1fr auto; }
+    .radio-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+    .radio-btn {
+      appearance:none; border:1px solid rgba(53,111,197,.35); background:rgba(8,22,52,.85); color:#dbeafe;
+      border-radius:8px; padding:10px 16px; font-size:12px; font-weight:800; cursor:pointer;
+    }
+    .radio-btn.active { border-color:rgba(255,86,86,.4); background:linear-gradient(180deg, rgba(187,24,24,.95), rgba(140,14,14,.95)); color:#fff; }
+    .radio-status {
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px; border-radius:10px; border:1px solid rgba(53,111,197,.22); background:rgba(255,255,255,.02);
+      font-size:12px; color:var(--muted);
+    }
+    .status-live { color:#33ff7d; font-weight:900; }
+    .audio-wrap {
+      border-radius:12px; border:1px solid rgba(53,111,197,.22); background:rgba(255,255,255,.02); padding:10px;
+      display:grid; grid-template-columns: 190px 1fr 56px; gap:12px; align-items:center;
+    }
+    .radio-logo {
+      height:132px; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background:linear-gradient(180deg, rgba(0,0,0,.38), rgba(6,12,25,.72)); border:1px solid rgba(53,111,197,.22);
+      font-weight:1000; text-transform:uppercase;
+    }
+    .radio-logo .tower { font-size:38px; color:#ff2a2a; line-height:1; }
+    .radio-logo .hub1 { font-size:20px; color:#fff; }
+    .radio-logo .hub2 { font-size:18px; color:#2da3ff; }
+    .player-main { display:flex; flex-direction:column; gap:10px; }
+    .radio-big-name { font-size:20px; font-weight:1000; }
+    .radio-big-sub { font-size:12px; color:#d6e5ff; }
+    .eq-bars { height:20px; display:flex; gap:4px; align-items:flex-end; }
+    .eq-bars span { width:4px; background:#22ff66; border-radius:2px 2px 0 0; box-shadow:0 0 5px rgba(34,255,102,.28); }
+    .control-row { display:flex; align-items:center; gap:10px; }
+    .ctl {
+      width:38px; height:38px; border-radius:8px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.03);
+      color:#fff; display:grid; place-items:center; font-size:16px; font-weight:900;
+    }
+    .ctl.main { width:50px; height:50px; border-radius:999px; background:linear-gradient(180deg, rgba(255,54,54,.98), rgba(188,18,18,.98)); border-color:rgba(255,124,124,.3); }
+    .vol-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+    .vol-label { font-size:10px; font-weight:900; color:#9cc9ff; letter-spacing:.16em; text-transform:uppercase; }
+    .vol-num { font-size:14px; font-weight:1000; color:#ff4040; }
+    .vol-bar { width:6px; height:110px; border-radius:999px; background:rgba(255,255,255,.08); position:relative; }
+    .vol-bar::after { content:""; position:absolute; left:0; right:0; bottom:0; height:68%; background:#ff2626; border-radius:999px; }
+    .freq-list {
+      overflow:auto; border-radius:12px; border:1px solid rgba(53,111,197,.22); background:rgba(255,255,255,.02); padding:4px 10px;
+    }
+    .freq-item {
+      display:grid; grid-template-columns: 1fr 1fr auto auto; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid rgba(255,255,255,.05); font-size:12px;
+    }
+    .freq-item:last-child { border-bottom:0; }
+    .sig { display:flex; gap:3px; align-items:flex-end; }
+    .sig span { width:4px; background:#23ff63; border-radius:1px 1px 0 0; }
+    .sig.warn span { background:#ffb020; }
+    .sig.low span { background:#ff4d20; }
+    .heart { color:#ff253a; font-size:20px; line-height:1; }
+    .heart.off { color:#6b7da0; }
+    .radio-actions { display:grid; grid-template-columns: repeat(4,1fr); gap:10px; }
+    .action-btn {
+      border:1px solid rgba(53,111,197,.32); background:rgba(8,22,52,.72); color:#dcecff; border-radius:8px; padding:10px 12px;
+      font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; text-align:center;
+    }
+
+    .tap-hint {
+      position:absolute; right:10px; bottom:8px; z-index:2; font-size:9px; color:#7fa0d8; letter-spacing:.16em; text-transform:uppercase;
+      pointer-events:none;
+    }
+
+    .system-bar {
+      display:flex; align-items:center; justify-content:center; gap:20px;
+      border:1px solid rgba(239,68,68,.25); border-radius:10px;
+      background:linear-gradient(90deg, rgba(90,8,8,.22), rgba(6,14,30,.95), rgba(10,34,78,.28));
+      font-weight:1000; text-transform:uppercase; letter-spacing:.22em; color:#ff3131; font-size:12px;
+      box-shadow: inset 0 0 10px rgba(255,255,255,.02);
+    }
+    .sys-line { width:140px; height:6px; background:repeating-linear-gradient(90deg, rgba(59,130,246,.95) 0 10px, transparent 10px 16px); opacity:.85; }
+
+    @media (max-aspect-ratio: 4/3) {
+      html, body { overflow:auto; height:auto; }
+      .hud { height:auto; min-height:100vh; grid-template-rows:72px 40px auto 28px; }
+      .top-row, .main-row { grid-template-columns:1fr; }
+      .left-grid { min-height:760px; }
+      .main-row { grid-auto-rows:minmax(520px, auto); }
+      .audio-wrap { grid-template-columns:1fr; }
+      .radio-actions { grid-template-columns:repeat(2,1fr); }
+    }
+  </style>
 </head>
 <body>
-<div id="app">
-  <div class="topbar">
-    <div class="panel brand">
-      <h1>PREMO1127</h1>
-      <div class="sub">MISSION CONTROL DASHBOARD</div>
-    </div>
-    <div class="top-card">
-      <div class="label">System Status</div>
-      <div class="value" id="sysStateTop">ONLINE</div>
-    </div>
-    <div class="top-card">
-      <div class="label">Network</div>
-      <div class="value blue" id="netStateTop">CONNECTED</div>
-    </div>
-    <div class="top-card">
-      <div class="label">Uptime</div>
-      <div class="value blue" id="uptimeTop">00:00:00:00</div>
-    </div>
-    <div class="panel clock-card">
-      <div class="time" id="topClock">00:00:00</div>
-      <div class="date" id="topDate">SATURDAY, 24 MAY 2025</div>
-    </div>
-  </div>
+  <div class="overlay" id="overlay"></div>
 
-  <div class="main">
-    <div class="left-stack">
-      <section class="panel">
-        <div class="panel-header"><div class="panel-title">System Time</div></div>
-        <div class="panel-body time-box">
-          <div class="big" id="clock">00:00:00</div>
-          <div class="small" id="dayBlock">SATURDAY,<br>24 MAY 2025</div>
+  <div class="hud">
+    <section class="top-row">
+      <article class="panel brand-box tapable" data-expandable>
+        <div class="brand-main"><span class="brand-red">PREMO1127</span><span class="brand-subline">AI CONTROL PANEL</span></div>
+        <div class="status-line"><span class="dot"></span><span>SYSTEM STATUS:</span> <span class="status-online">ONLINE</span></div>
+        <div class="brand-actions">
+          <div class="mini-btn">Dashboard</div>
+          <div class="mini-btn">Systems</div>
+          <div class="mini-btn alert">Alerts</div>
+          <div class="mini-btn">Settings</div>
         </div>
-      </section>
+        
+      </article>
 
-      <section class="panel">
-        <div class="panel-header"><div class="panel-title">System Overview</div></div>
-        <div class="panel-body">
-          <div class="overview-grid">
-            <div>
-              <div class="metric-row"><div class="name">CPU USAGE</div><div class="val" id="cpuLoad">18%</div></div>
-              <div class="bar"><span id="cpuBar" style="width:18%"></span></div>
+      <article class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Weather</div>
+          
+        </div>
+        <div class="panel-body weather-panel-body">
+          <div class="weather-wrap">
+            <div class="weather-left">
+              <div class="temp-row"><div class="weather-icon">🌧️</div><div class="temp" id="weatherTemp">--°C</div></div>
+              <div class="desc" id="weatherDesc">Loading live conditions</div>
+              <div class="feels">Feels like <span id="feelsLike">--°C</span></div>
             </div>
             <div>
-              <div class="metric-row"><div class="name">RAM USAGE</div><div class="val" id="memLoad">42%</div></div>
-              <div class="bar"><span id="memBar" style="width:42%"></span></div>
-            </div>
-            <div>
-              <div class="metric-row"><div class="name">NETWORK</div><div class="val"><span style="color:var(--green)">▲</span> <span id="downloadVal">152 KB/s</span> &nbsp; <span style="color:#49d8ff">▼</span> <span id="uploadVal">98 KB/s</span></div></div>
-              <div class="bar"><span id="netBar" style="width:63%"></span></div>
-            </div>
-            <div>
-              <div class="metric-row"><div class="name">SYSTEM TEMP</div><div class="val" id="sysTemp">45°C</div></div>
-              <div class="bar"><span id="tempBar" style="width:45%"></span></div>
+              <div class="mini-grid">
+                <div class="mini-box"><div class="label">Wind</div><div class="value" id="windSpeed">-- km/h</div></div>
+                <div class="mini-box"><div class="label">Rain</div><div class="value" id="rainAmt">-- mm</div></div>
+                <div class="mini-box"><div class="label">Humidity</div><div class="value" id="humidity">--%</div></div>
+                <div class="mini-box"><div class="label">Pressure</div><div class="value" id="pressure">-- hPa</div></div>
+              </div>
+              <div class="forecast" id="forecastWrap"></div>
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </article>
 
-    <div class="center-col">
-      <section class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Fife CCTV Wall</div>
-          <div class="panel-title" style="font-size:12px;color:#00e0ff">Live Cameras ●</div>
+      <article class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Time</div>
+          <div class="badge green">Live</div>
         </div>
-        <div class="panel-body">
-          <div class="cctv-shell">
-            <div class="cctv-grid" id="cctvGrid">
-              <div class="tile">
-                <img id="cam-lochgelly" alt="Lochgelly webcam">
-                <a class="link-overlay" href="https://www.fifeweather.co.uk/index.php/weathercam" target="_blank" rel="noopener"></a>
-                <div class="tile-overlay"><div class="tile-top"><div class="tile-name">LOCHGELLY</div><div class="live">LIVE</div></div><div></div><div class="tile-bottom"><span>Lochgelly, Fife</span><span id="camTime1">--:--</span></div></div>
-              </div>
-              <div class="tile">
-                <img id="cam-aberdour" alt="Aberdour webcam">
-                <a class="link-overlay" href="https://www.fifeweather.co.uk/index.php/weathercam" target="_blank" rel="noopener"></a>
-                <div class="tile-overlay"><div class="tile-top"><div class="tile-name">ABERDOUR</div><div class="live">LIVE</div></div><div></div><div class="tile-bottom"><span>Aberdour, Fife</span><span id="camTime2">--:--</span></div></div>
-              </div>
-              <div class="tile">
-                <img id="cam-standrews" alt="St Andrews webcam">
-                <a class="link-overlay" href="https://www.fifeweather.co.uk/index.php/weathercam" target="_blank" rel="noopener"></a>
-                <div class="tile-overlay"><div class="tile-top"><div class="tile-name">ST ANDREWS</div><div class="live">LIVE</div></div><div></div><div class="tile-bottom"><span>St Andrews, Fife</span><span id="camTime3">--:--</span></div></div>
-              </div>
-              <div class="tile">
-                <img id="cam-anstruther" alt="Anstruther webcam">
-                <a class="link-overlay" href="https://www.fifeweather.co.uk/index.php/weathercam" target="_blank" rel="noopener"></a>
-                <div class="tile-overlay"><div class="tile-top"><div class="tile-name">ANSTRUTHER HARBOUR</div><div class="live">LIVE</div></div><div></div><div class="tile-bottom"><span>Anstruther, Fife</span><span id="camTime4">--:--</span></div></div>
-              </div>
-            </div>
-            <div class="cctv-controls">
-              <div class="preset-strip">
-                <button class="active">CAM 1</button>
-                <button class="active">CAM 2</button>
-                <button class="active">CAM 3</button>
-                <button class="active">CAM 4</button>
-              </div>
-              <button class="ghost-btn" id="refreshCamsBtn">REFRESH WALL</button>
-              <a class="ghost-btn" href="https://www.fifeweather.co.uk/index.php/weathercam" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center">OPEN FULL SCREEN</a>
-            </div>
-          </div>
+        <div class="panel-body clock-panel time-panel-body">
+          <div class="clock-time" id="clockTime">00:00:00</div>
+          <div class="clock-date" id="clockDate">Loading date</div>
         </div>
-      </section>
-    </div>
-
-    <div class="right-stack">
-      <section class="panel">
-        <div class="panel-header"><div class="panel-title">Weather Station</div></div>
-        <div class="panel-body weather-layout">
-          <div class="weather-main">
-            <div class="wx-left">
-              <div class="wx-place">KIRKCALDY, FIFE</div>
-              <div class="wx-temp" id="temp">--°C</div>
-              <div class="wx-desc" id="wxdesc">LOADING</div>
-            </div>
-            <div class="wx-right">
-              <div class="wx-line"><span>Feels Like</span><span id="feel">--°C</span></div>
-              <div class="wx-line"><span>Humidity</span><span id="humidity">--%</span></div>
-              <div class="wx-line"><span>Wind</span><span id="wind">-- km/h</span></div>
-              <div class="wx-line"><span>Pressure</span><span id="pressure">-- hPa</span></div>
-              <div class="wx-line"><span>Visibility</span><span id="visibility">-- km</span></div>
-              <div class="wx-line"><span>UV Index</span><span id="uv" class="good">--</span></div>
-            </div>
-          </div>
-          <div class="forecast-grid" id="forecastGrid"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-header"><div class="panel-title">Scotland Radio Console</div></div>
-        <div class="panel-body radio-layout">
-          <div class="radio-presets">
-            <button class="radio-btn active" data-preset="ham80">HAM 80M</button>
-            <button class="radio-btn" data-preset="ham40">HAM 40M</button>
-            <button class="radio-btn" data-preset="ham20">HAM 20M</button>
-            <button class="radio-btn" data-preset="air">AIR TRAFFIC</button>
-            <button class="radio-btn" data-preset="marine">MARINE</button>
-            <button class="radio-btn" data-preset="shortwave">SHORTWAVE</button>
-          </div>
-          <div class="radio-console-grid">
-            <select class="radio-select" id="rxSelect"></select>
-            <button class="radio-open" id="rxOpenBtn">OPEN</button>
-          </div>
-          <div class="receiver-box">
-            <iframe id="rxFrame" title="Radio receiver" referrerpolicy="no-referrer"></iframe>
-            <div class="receiver-fallback" id="rxFallback" style="display:none">RECEIVER EMBED BLOCKED<br><br>PRESS OPEN TO LAUNCH THE RADIO</div>
-          </div>
-          <div class="info-grid" id="rxInfo">
-            <div>PRESET</div><div class="v">HAM 80M</div>
-            <div>FREQ</div><div class="v">3.700 MHZ LSB</div>
-            <div>RX</div><div class="v">GM4RDX SCOTLAND</div>
-            <div>STATUS</div><div class="v" id="rxStatus">READY</div>
-          </div>
-          <div style="font:500 11px Orbitron,sans-serif;letter-spacing:.06em;color:#c4f6ff" id="rxNote">BEST FOR UK EVENING CHATS / OPEN FOR FULL CONTROL</div>
-        </div>
-      </section>
-    </div>
-  </div>
-
-  <div class="bottom">
-    <section class="panel news-panel">
-      <div class="news-header">
-        <div class="left">Live News Feed</div>
-        <div class="right">UPDATING EVERY 60 SECONDS</div>
-      </div>
-      <div class="panel-body ticker-wrap">
-        <div class="ticker" id="ticker">LOADING LIVE HEADLINES •</div>
-      </div>
+      </article>
     </section>
 
-    <div class="stats-row">
-      <div class="bottom-stat">CPU: <strong id="cpuBottom">18%</strong><div class="mini-bar"><span id="cpuBottomBar"></span></div></div>
-      <div class="bottom-stat">RAM: <strong id="ramBottom">42%</strong><div class="mini-bar"><span id="ramBottomBar" style="width:42%"></span></div></div>
-      <div class="bottom-stat">DISK: <strong id="diskBottom">37%</strong><div class="mini-bar"><span id="diskBottomBar" style="width:37%"></span></div></div>
-      <div class="bottom-stat">TEMP: <strong id="tempBottom">45°C</strong><div class="mini-bar"><span id="tempBottomBar" style="width:45%"></span></div></div>
-      <div class="bottom-stat">DASHBOARD <strong>v3.0.0</strong></div>
-    </div>
+    <section class="panel news-strip tapable" data-expandable>
+      <div class="news-label">News</div>
+      <div class="ticker-viewport">
+        <div class="ticker-track" id="tickerTrack">Loading latest headlines • Loading latest headlines • Loading latest headlines •</div>
+      </div>
+      
+    </section>
+
+    <section class="main-row">
+      <section class="left-grid">
+        <article class="panel tapable" data-expandable>
+          <div class="panel-head">
+            <div class="panel-title">Forth Bridges</div>
+            <div class="live-tag"><span class="live-dot"></span>Live</div>
+          </div>
+          <div class="panel-body" style="padding:0;">
+            <div class="cam-box" style="height:100%; border:0; border-radius:0;">
+              <div class="cam-head">
+                <div class="cam-title-row"><div class="cam-num">1</div><div><div class="cam-name">Forth Bridges</div><div class="cam-sub">Main bridge traffic webcams</div></div></div>
+                <div class="badge">Bridge</div>
+              </div>
+              <div class="cam-view bridge">
+                <div class="cam-footer"><span class="cam-time" id="camTime1">22:42:55</span><span class="cam-link">Bridge Cam ↗</span></div>
+              </div>
+            </div>
+            
+          </div>
+        </article>
+
+        <article class="panel tapable" data-expandable>
+          <div class="panel-head">
+            <div class="panel-title">Traffic Scotland</div>
+            <div class="live-tag"><span class="live-dot"></span>Live</div>
+          </div>
+          <div class="panel-body" style="padding:0;">
+            <div class="cam-box" style="height:100%; border:0; border-radius:0;">
+              <div class="cam-head">
+                <div class="cam-title-row"><div class="cam-num">2</div><div><div class="cam-name">Traffic Scotland</div><div class="cam-sub">Official traffic camera feed</div></div></div>
+                <div class="badge">Official</div>
+              </div>
+              <div class="cam-view official">
+                <div class="cam-footer"><span class="cam-time" id="camTime2">22:42:55</span><span class="cam-link">Official Cam ↗</span></div>
+              </div>
+            </div>
+            
+          </div>
+        </article>
+
+        <article class="panel tapable" data-expandable>
+          <div class="panel-head">
+            <div class="panel-title">Queensferry Traffic</div>
+            <div class="live-tag"><span class="live-dot"></span>Live</div>
+          </div>
+          <div class="panel-body" style="padding:0;">
+            <div class="cam-box" style="height:100%; border:0; border-radius:0;">
+              <div class="cam-head">
+                <div class="cam-title-row"><div class="cam-num">3</div><div><div class="cam-name">Queensferry Traffic</div><div class="cam-sub">Approach roads and crossing area</div></div></div>
+                <div class="badge">Road</div>
+              </div>
+              <div class="cam-view traffic">
+                <div class="cam-footer"><span class="cam-time" id="camTime3">22:42:55</span><span class="cam-link">Road Cam ↗</span></div>
+              </div>
+            </div>
+            
+          </div>
+        </article>
+
+        <article class="panel tapable" data-expandable>
+          <div class="panel-head">
+            <div class="panel-title">A92 Corridor</div>
+            <div class="live-tag"><span class="live-dot"></span>Live</div>
+          </div>
+          <div class="panel-body" style="padding:0;">
+            <div class="cam-box" style="height:100%; border:0; border-radius:0;">
+              <div class="cam-head">
+                <div class="cam-title-row"><div class="cam-num">4</div><div><div class="cam-name">A92 Corridor</div><div class="cam-sub">Backup route camera</div></div></div>
+                <div class="badge">Route</div>
+              </div>
+              <div class="cam-view route">
+                <div class="cam-footer"><span class="cam-time" id="camTime4">22:42:55</span><span class="cam-link">Route Cam ↗</span></div>
+              </div>
+            </div>
+            
+          </div>
+        </article>
+      </section>
+
+      <article class="panel tapable" data-expandable>
+        <div class="panel-head">
+          <div class="panel-title">Radio Control</div>
+          <div class="badge red">In-HUD Audio</div>
+        </div>
+        <div class="panel-body">
+          <div class="radio-layout">
+            <div class="radio-tabs">
+              <button class="radio-btn active" data-stream-name="HUBNet AllStar" data-stream-url="https://www.broadcastify.com/webPlayer/27462">HUBNet</button>
+              <button class="radio-btn" data-stream-name="Scotland Amateur" data-stream-url="https://www.broadcastify.com/listen/stid/603">Scotland Ham</button>
+              <button class="radio-btn" data-stream-name="ATC Slot" data-stream-url="">ATC Slot</button>
+              <button class="radio-btn" data-stream-name="Marine / Coast" data-stream-url="">Marine</button>
+            </div>
+
+            <div class="radio-status"><div><span class="status-live">● LIVE:</span> <span id="streamStatus">HUBNet AllStar</span></div><div id="streamHint">UK AMATEUR RADIO NETWORK</div></div>
+
+            <div class="audio-wrap">
+              <div class="radio-logo"><div class="tower">📡</div><div class="hub1">HUBNet</div><div class="hub2">AllStar</div></div>
+              <div class="player-main">
+                <div><div class="radio-big-name" id="radioName">HUBNet AllStar</div><div class="radio-big-sub">UK Amateur Radio Network</div></div>
+                <div class="eq-bars">
+                  <span style="height:18px"></span><span style="height:14px"></span><span style="height:20px"></span><span style="height:13px"></span><span style="height:18px"></span><span style="height:12px"></span><span style="height:20px"></span><span style="height:15px"></span><span style="height:17px"></span><span style="height:12px"></span><span style="height:19px"></span><span style="height:15px"></span><span style="height:18px"></span><span style="height:13px"></span><span style="height:20px"></span><span style="height:16px"></span><span style="height:18px"></span><span style="height:14px"></span><span style="height:20px"></span><span style="height:12px"></span>
+                </div>
+                <div class="control-row"><button class="ctl">■</button><button class="ctl">⏮</button><button class="ctl main">⏸</button><button class="ctl">⏭</button><button class="ctl">🔈</button></div>
+                <iframe id="radioFrame" src="https://www.broadcastify.com/webPlayer/27462" title="Radio player" style="height:1px; width:1px; opacity:0; position:absolute; pointer-events:none;"></iframe>
+              </div>
+              <div class="vol-wrap"><div class="vol-label">Vol</div><div class="vol-num">68%</div><div class="vol-bar"></div></div>
+            </div>
+
+            <div class="freq-list" id="freqList">
+              <div class="freq-item"><span>HUBNet AllStar</span><span>UK Ham Network</span><span class="sig"><span style="height:10px"></span><span style="height:14px"></span><span style="height:18px"></span><span style="height:22px"></span><span style="height:26px"></span></span><span class="heart">♥</span></div>
+              <div class="freq-item"><span>DMR TG23526</span><span>Linked traffic</span><span class="sig"><span style="height:9px"></span><span style="height:13px"></span><span style="height:17px"></span><span style="height:21px"></span><span style="height:24px"></span></span><span class="heart off">♡</span></div>
+              <div class="freq-item"><span>Scotland Amateur</span><span>Regional feed list</span><span class="sig"><span style="height:8px"></span><span style="height:12px"></span><span style="height:16px"></span><span style="height:20px"></span><span style="height:23px"></span></span><span class="heart off">♡</span></div>
+              <div class="freq-item"><span>ATC Slot</span><span>Add airport source</span><span class="sig warn"><span style="height:8px"></span><span style="height:11px"></span><span style="height:15px"></span><span style="height:19px"></span><span style="height:22px"></span></span><span class="heart off">♡</span></div>
+              <div class="freq-item"><span>Marine / Coast</span><span>Maritime channels</span><span class="sig low"><span style="height:8px"></span><span style="height:11px"></span><span style="height:14px"></span><span style="height:17px"></span><span style="height:20px"></span></span><span class="heart off">♡</span></div>
+            </div>
+
+            <div class="radio-actions"><div class="action-btn">＋ Add Source</div><div class="action-btn">⌕ Scan</div><div class="action-btn">⚙ Settings</div><div class="action-btn">◔ 10s Zoom</div></div>
+          </div>
+          
+        </div>
+      </article>
+    </section>
+
+    <div class="system-bar"><div class="sys-line"></div><div>PREMO1127 SYSTEMS</div><div class="sys-line"></div></div>
   </div>
-</div>
 
-<script>
-(() => {
-  const fixedLat = 56.11;
-  const fixedLon = -3.16;
-  const bootTime = Date.now();
-  const $ = id => document.getElementById(id);
-  const els = {
-    topClock: $('topClock'), topDate: $('topDate'), clock: $('clock'), dayBlock: $('dayBlock'), uptimeTop:$('uptimeTop'),
-    temp:$('temp'), wxdesc:$('wxdesc'), feel:$('feel'), humidity:$('humidity'), wind:$('wind'), pressure:$('pressure'), visibility:$('visibility'), uv:$('uv'), forecastGrid:$('forecastGrid'),
-    cpuLoad:$('cpuLoad'), memLoad:$('memLoad'), downloadVal:$('downloadVal'), uploadVal:$('uploadVal'), sysTemp:$('sysTemp'),
-    cpuBar:$('cpuBar'), memBar:$('memBar'), netBar:$('netBar'), tempBar:$('tempBar'),
-    cpuBottom:$('cpuBottom'), ramBottom:$('ramBottom'), diskBottom:$('diskBottom'), tempBottom:$('tempBottom'),
-    cpuBottomBar:$('cpuBottomBar'), ramBottomBar:$('ramBottomBar'), diskBottomBar:$('diskBottomBar'), tempBottomBar:$('tempBottomBar'),
-    ticker:$('ticker'), refreshCamsBtn:$('refreshCamsBtn'), sysStateTop:$('sysStateTop'), netStateTop:$('netStateTop'),
-    rxSelect:$('rxSelect'), rxOpenBtn:$('rxOpenBtn'), rxFrame:$('rxFrame'), rxFallback:$('rxFallback'), rxInfo:$('rxInfo'), rxStatus:$('rxStatus'), rxNote:$('rxNote')
-  };
+  <script>
+    const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast?latitude=56.127458&longitude=-3.314762&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,pressure_msl,precipitation&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto&forecast_days=3';
+    const NEWS_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://feeds.bbci.co.uk/news/rss.xml');
+    const weatherCodeMap = {0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Rime fog',51:'Light drizzle',53:'Drizzle',55:'Dense drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',80:'Showers',81:'Heavy showers',95:'Thunderstorm'};
+    const dayIconMap = {0:'☁️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',80:'🌦️',81:'🌧️',95:'⛈️'};
 
-  const cameraSources = {
-    lochgelly: 'https://camhost01.weatherevents.net/images/static_weathercams.php?view=lochgellycam',
-    aberdour: 'https://camhost01.weatherevents.net/images/static_weathercams.php?view=aberdourcam',
-    standrews: 'https://camhost01.weatherevents.net/images/static_weathercams.php?view=standrewscam',
-    anstruther: 'https://camhost01.weatherevents.net/images/static_weathercams.php?view=anstruthercam'
-  };
+    let expandTimer = null;
+    let activeExpanded = null;
 
-  function refreshCams() {
-    const stamp = Date.now();
-    $('cam-lochgelly').src = `${cameraSources.lochgelly}&_=${stamp}`;
-    $('cam-aberdour').src = `${cameraSources.aberdour}&_=${stamp}`;
-    $('cam-standrews').src = `${cameraSources.standrews}&_=${stamp}`;
-    $('cam-anstruther').src = `${cameraSources.anstruther}&_=${stamp}`;
-    const t = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
-    $('camTime1').textContent = t; $('camTime2').textContent = t; $('camTime3').textContent = t; $('camTime4').textContent = t;
-  }
-
-  function tickClock() {
-    const now = new Date();
-    const time = now.toLocaleTimeString('en-GB', {hour12:false, timeZone:'Europe/London'});
-    const date = now.toLocaleDateString('en-GB', {weekday:'long', day:'2-digit', month:'long', year:'numeric', timeZone:'Europe/London'}).toUpperCase();
-    els.topClock.textContent = time;
-    els.clock.textContent = time;
-    els.topDate.textContent = date;
-    const weekday = now.toLocaleDateString('en-GB', {weekday:'long', timeZone:'Europe/London'}).toUpperCase();
-    const day = now.toLocaleDateString('en-GB', {day:'2-digit', month:'long', year:'numeric', timeZone:'Europe/London'}).toUpperCase();
-    els.dayBlock.innerHTML = `${weekday},<br>${day}`;
-    const diff = Math.floor((Date.now() - bootTime) / 1000);
-    const d = String(Math.floor(diff / 86400)).padStart(2,'0');
-    const h = String(Math.floor((diff % 86400) / 3600)).padStart(2,'0');
-    const m = String(Math.floor((diff % 3600) / 60)).padStart(2,'0');
-    const s = String(diff % 60).padStart(2,'0');
-    els.uptimeTop.textContent = `${d}:${h}:${m}:${s}`;
-  }
-
-  function updateMetrics() {
-    const t = Date.now() / 1000;
-    const cpu = Math.round(18 + (Math.sin(t*.5)+1)*12);
-    const mem = Math.round(34 + (Math.sin(t*.39+1)+1)*12);
-    const down = Math.round(110 + (Math.sin(t*.28)+1)*42);
-    const up = Math.round(60 + (Math.sin(t*.33+1.6)+1)*19);
-    const temp = Math.round(39 + (Math.sin(t*.24+2)+1)*6);
-    const disk = Math.round(28 + (Math.sin(t*.21+.5)+1)*10);
-    els.cpuLoad.textContent = `${cpu}%`;
-    els.memLoad.textContent = `${mem}%`;
-    els.downloadVal.textContent = `${down} KB/s`;
-    els.uploadVal.textContent = `${up} KB/s`;
-    els.sysTemp.textContent = `${temp}°C`;
-    els.cpuBar.style.width = `${cpu}%`;
-    els.memBar.style.width = `${mem}%`;
-    els.netBar.style.width = `${Math.min(100, Math.round((down+up)/3))}%`;
-    els.tempBar.style.width = `${temp}%`;
-    els.cpuBottom.textContent = `${cpu}%`;
-    els.ramBottom.textContent = `${mem}%`;
-    els.diskBottom.textContent = `${disk}%`;
-    els.tempBottom.textContent = `${temp}°C`;
-    els.cpuBottomBar.style.width = `${cpu}%`;
-    els.ramBottomBar.style.width = `${mem}%`;
-    els.diskBottomBar.style.width = `${disk}%`;
-    els.tempBottomBar.style.width = `${temp}%`;
-    els.sysStateTop.textContent = navigator.onLine ? 'ONLINE' : 'OFFLINE';
-    els.netStateTop.textContent = navigator.onLine ? 'CONNECTED' : 'OFFLINE';
-  }
-
-  const weatherCodeMap = {0:['CLEAR','☀'],1:['MAINLY CLEAR','🌤'],2:['PARTLY CLOUDY','⛅'],3:['OVERCAST','☁'],45:['FOG','🌫'],48:['FOG','🌫'],51:['LIGHT DRIZZLE','🌦'],53:['DRIZZLE','🌦'],55:['DRIZZLE','🌧'],61:['LIGHT RAIN','🌦'],63:['RAIN','🌧'],65:['HEAVY RAIN','🌧'],71:['LIGHT SNOW','🌨'],73:['SNOW','🌨'],75:['HEAVY SNOW','❄'],80:['SHOWERS','🌦'],81:['SHOWERS','🌧'],82:['HEAVY SHOWERS','🌧'],95:['THUNDER','⛈'],96:['STORM','⛈'],99:['STORM','⛈']};
-
-  async function fetchWeather() {
-    try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${fixedLat}&longitude=${fixedLon}&timezone=Europe%2FLondon&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,surface_pressure,visibility,uv_index&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=5`;
-      const res = await fetch(url, {cache:'no-store'});
-      const data = await res.json();
-      const cur = data.current || {};
-      const meta = weatherCodeMap[cur.weather_code] || ['LIVE CONDITIONS','☁'];
-      els.temp.textContent = `${Math.round(cur.temperature_2m)}°C`;
-      els.wxdesc.textContent = meta[0];
-      els.feel.textContent = `${Math.round(cur.apparent_temperature)}°C`;
-      els.humidity.textContent = `${Math.round(cur.relative_humidity_2m)}%`;
-      els.wind.textContent = `${Math.round(cur.wind_speed_10m)} km/h`;
-      els.pressure.textContent = `${Math.round(cur.surface_pressure)} hPa`;
-      els.visibility.textContent = `${Math.round((cur.visibility || 0) / 1000)} km`;
-      els.uv.textContent = `${Math.round(cur.uv_index || 0)} ${Number(cur.uv_index || 0) >= 3 ? 'MOD' : 'LOW'}`;
-      const days = data.daily.time.map((day, i) => ({
-        day: new Date(day).toLocaleDateString('en-GB', {weekday:'short', timeZone:'Europe/London'}).toUpperCase(),
-        icon: (weatherCodeMap[data.daily.weather_code[i]] || ['', '☁'])[1],
-        hi: Math.round(data.daily.temperature_2m_max[i]),
-        lo: Math.round(data.daily.temperature_2m_min[i])
-      }));
-      els.forecastGrid.innerHTML = days.map(d => `<div class="day-card"><div class="day">${d.day}</div><div class="icon">${d.icon}</div><div class="hi">${d.hi}°C</div><div class="lo">${d.lo}°C</div></div>`).join('');
-    } catch (e) {
-      els.wxdesc.textContent = 'WEATHER OFFLINE';
+    function updateClock() {
+      const now = new Date();
+      const timeText = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      document.getElementById('clockTime').textContent = timeText;
+      document.getElementById('clockDate').textContent = now.toLocaleDateString([], { weekday:'long', day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
+      ['camTime1','camTime2','camTime3','camTime4'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = timeText;
+      });
     }
-  }
 
-  function renderNews(items) {
-    if (!items || !items.length) {
-      els.ticker.textContent = 'LIVE NEWS FEED OFFLINE • PREMO1127 SYSTEM ACTIVE •';
-      return;
-    }
-    const combined = items.slice(0,12).map((title, idx) => `<span class="stamp">${String(idx+1).padStart(2,'0')}</span>${escapeHtml(title)}`).join(' &nbsp; • &nbsp; ');
-    els.ticker.innerHTML = combined + ' &nbsp; • &nbsp; ' + combined;
-    startTicker();
-  }
-
-  function escapeHtml(str){return str.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-
-  function extractItemsFromRSS(xmlText) {
-    const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
-    return [...xml.querySelectorAll('item title')].map(x => x.textContent.trim()).filter(Boolean);
-  }
-
-  async function fetchNews() {
-    const rssUrl = 'https://feeds.bbci.co.uk/news/rss.xml';
-    try {
-      const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl) + '&_=' + Date.now(), {cache:'no-store'});
-      const data = await res.json();
-      const items = (data.items || []).map(x => (x.title || '').trim()).filter(Boolean);
-      if (items.length) return renderNews(items);
-      throw new Error('empty');
-    } catch {
+    async function loadWeather() {
       try {
-        const res2 = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl) + '&_=' + Date.now(), {cache:'no-store'});
-        const xmlText = await res2.text();
-        renderNews(extractItemsFromRSS(xmlText));
-      } catch {
-        renderNews([]);
+        const res = await fetch(WEATHER_URL);
+        const data = await res.json();
+        const current = data.current;
+        const daily = data.daily;
+        document.getElementById('weatherTemp').textContent = Math.round(current.temperature_2m) + '°C';
+        document.getElementById('weatherDesc').textContent = weatherCodeMap[current.weather_code] || 'Live conditions';
+        document.getElementById('feelsLike').textContent = Math.round(current.apparent_temperature) + '°C';
+        document.getElementById('windSpeed').textContent = Math.round(current.wind_speed_10m) + ' km/h';
+        document.getElementById('humidity').textContent = current.relative_humidity_2m + '%';
+        document.getElementById('pressure').textContent = Math.round(current.pressure_msl || 1008) + ' hPa';
+        document.getElementById('rainAmt').textContent = ((current.precipitation ?? 0).toFixed(1)) + ' mm';
+
+        const wrap = document.getElementById('forecastWrap');
+        wrap.innerHTML = '';
+        daily.time.forEach((day, i) => {
+          const item = document.createElement('div');
+          item.className = 'day';
+          item.innerHTML = `<div class="label">${new Date(day).toLocaleDateString([], { weekday:'short' }).toUpperCase()}</div><div class="day-icon">${dayIconMap[daily.weather_code[i]] || '☁️'}</div><div class="value">${Math.round(daily.temperature_2m_max[i])}°C</div><div style="margin-top:3px; color:var(--muted); font-size:11px;">${Math.round(daily.temperature_2m_min[i])}°C</div>`;
+          wrap.appendChild(item);
+        });
+      } catch (e) {
+        document.getElementById('weatherDesc').textContent = 'Weather feed unavailable';
       }
     }
-  }
 
-  let tickerX = 0;
-  function startTicker() {
-    cancelAnimationFrame(startTicker.raf);
-    const el = els.ticker;
-    function frame() {
-      const width = el.getBoundingClientRect().width;
-      const view = el.parentElement.getBoundingClientRect().width;
-      if (tickerX === 0) tickerX = view;
-      tickerX -= .8;
-      if (tickerX < -width / 2) tickerX = 0;
-      el.style.transform = `translate(${tickerX}px,-50%)`;
-      startTicker.raf = requestAnimationFrame(frame);
-    }
-    tickerX = 0;
-    frame();
-  }
-
-  function initRadioPanel() {
-    const receivers = {
-      scotland: { url: 'http://gm4rdx.proxy.kiwisdr.com:8073/', name: 'GM4RDX SCOTLAND' },
-      hackgreen: { url: 'http://hackgreensdr.org:8901/', name: 'HACK GREEN WEBSDR' },
-      burgess: { url: 'http://msars.ddns.net:8073/', name: 'BURGESS HILL KIWISDR' },
-      southport: { url: 'https://sdr.shortwave.am/', name: 'SOUTHPORT UK KIWISDR' }
-    };
-    const presets = {
-      ham80: { label:'HAM 80M', freq:'3.700 MHZ LSB', receiver:'scotland', note:'BEST FOR UK EVENING CHATS / OPEN FOR FULL CONTROL' },
-      ham40: { label:'HAM 40M', freq:'7.100 MHZ LSB', receiver:'scotland', note:'GOOD UK + EUROPE DAY / EVENING / OPEN FOR FULL CONTROL' },
-      ham20: { label:'HAM 20M', freq:'14.200 MHZ USB', receiver:'scotland', note:'BEST FOR WORLDWIDE DAYTIME CONTACTS / OPEN FOR FULL CONTROL' },
-      air: { label:'AIR TRAFFIC', freq:'118–137 MHZ AM', receiver:'hackgreen', note:'TRY FOR ATC / PILOT CHAT / OPEN FOR FULL CONTROL' },
-      marine: { label:'MARINE', freq:'156–162 MHZ FM', receiver:'hackgreen', note:'GOOD FOR COASTAL / SHIP TRAFFIC / OPEN FOR FULL CONTROL' },
-      shortwave: { label:'SHORTWAVE', freq:'6–15 MHZ AM', receiver:'southport', note:'GLOBAL HF BROADCASTS / UTILITY / OPEN FOR FULL CONTROL' }
-    };
-    let currentPreset = 'ham80';
-
-    function markButtons() {
-      document.querySelectorAll('[data-preset]').forEach(btn => btn.classList.toggle('active', btn.dataset.preset === currentPreset));
+    async function loadNews() {
+      try {
+        const res = await fetch(NEWS_URL);
+        const xml = await res.text();
+        const doc = new DOMParser().parseFromString(xml, 'text/xml');
+        const items = [...doc.querySelectorAll('item')].slice(0, 8).map(item => item.querySelector('title')?.textContent?.trim() || 'Headline unavailable');
+        const tickerText = items.map(x => '◆ ' + x).join('     ');
+        document.getElementById('tickerTrack').textContent = tickerText + '     ' + tickerText;
+      } catch (e) {
+        document.getElementById('tickerTrack').textContent = 'News feed unavailable • News feed unavailable •';
+      }
     }
 
-    function applyPreset(key) {
-      const preset = presets[key];
-      if (!preset) return;
-      currentPreset = key;
-      markButtons();
-      const rx = receivers[preset.receiver];
-      els.rxSelect.innerHTML = `<option value="${rx.url}">${rx.name}</option>`;
-      els.rxSelect.value = rx.url;
-      els.rxFrame.src = rx.url;
-      els.rxFrame.style.display = 'block';
-      els.rxFallback.style.display = 'none';
-      els.rxInfo.innerHTML = `<div>PRESET</div><div class="v">${preset.label}</div><div>FREQ</div><div class="v">${preset.freq}</div><div>RX</div><div class="v">${rx.name}</div><div>STATUS</div><div class="v">READY</div>`;
-      els.rxNote.textContent = preset.note;
-      setTimeout(() => {
-        try { void els.rxFrame.contentWindow; }
-        catch { els.rxFrame.style.display = 'none'; els.rxFallback.style.display = 'block'; }
-      }, 2200);
+    function collapseExpanded() {
+      const overlay = document.getElementById('overlay');
+      if (activeExpanded) {
+        activeExpanded.classList.remove('expanded');
+        activeExpanded = null;
+      }
+      overlay.classList.remove('show');
+      if (expandTimer) clearTimeout(expandTimer);
     }
 
-    document.querySelectorAll('[data-preset]').forEach(btn => btn.addEventListener('click', () => applyPreset(btn.dataset.preset)));
-    els.rxOpenBtn.addEventListener('click', () => { if (els.rxSelect.value) window.open(els.rxSelect.value, '_blank', 'noopener'); });
-    applyPreset('ham80');
-  }
+    function setupExpandablePanels() {
+      const overlay = document.getElementById('overlay');
+      document.querySelectorAll('[data-expandable]').forEach(panel => {
+        panel.addEventListener('click', (e) => {
+          if (e.target.closest('.radio-btn') || e.target.closest('.ctl') || e.target.closest('.action-btn')) return;
+          if (activeExpanded === panel) return collapseExpanded();
+          collapseExpanded();
+          activeExpanded = panel;
+          panel.classList.add('expanded');
+          overlay.classList.add('show');
+          expandTimer = setTimeout(collapseExpanded, 10000);
+        });
+      });
+      overlay.addEventListener('click', collapseExpanded);
+    }
 
-  els.refreshCamsBtn.addEventListener('click', refreshCams);
+    function setupRadioButtons() {
+      const buttons = [...document.querySelectorAll('.radio-btn')];
+      const frame = document.getElementById('radioFrame');
+      const name = document.getElementById('radioName');
+      const status = document.getElementById('streamStatus');
+      const hint = document.getElementById('streamHint');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const streamName = btn.dataset.streamName;
+          const streamUrl = btn.dataset.streamUrl;
+          name.textContent = streamName;
+          status.textContent = streamName;
+          if (streamUrl) {
+            frame.src = streamUrl;
+            hint.textContent = streamName === 'HUBNet AllStar' ? 'UK AMATEUR RADIO NETWORK' : 'LIVE SOURCE SELECTED';
+          } else {
+            frame.src = 'about:blank';
+            hint.textContent = 'ADD A WORKING SOURCE';
+          }
+        });
+      });
+    }
 
-  tickClock();
-  updateMetrics();
-  refreshCams();
-  fetchWeather();
-  fetchNews();
-  initRadioPanel();
-  setInterval(tickClock, 1000);
-  setInterval(updateMetrics, 1600);
-  setInterval(refreshCams, 15000);
-  setInterval(fetchWeather, 10 * 60 * 1000);
-  setInterval(fetchNews, 60 * 1000);
-})();
-</script>
+    updateClock();
+    loadWeather();
+    loadNews();
+    setupExpandablePanels();
+    setupRadioButtons();
+    setInterval(updateClock, 1000);
+    setInterval(loadWeather, 5 * 60 * 1000);
+    setInterval(loadNews, 5 * 60 * 1000);
+  </script>
 </body>
 </html>
